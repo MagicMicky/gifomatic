@@ -1,0 +1,53 @@
+<html>
+<head>
+</head>
+<body>
+<div><button onClick="fetchGif('nicolas+cage')"/>nicolas+cage</button></div>
+<video id="monbeaugif" autoplay loop />
+<script>
+const video = document.getElementById('monbeaugif')
+let _nextVideo
+
+const getMp4Link = (tag) => {
+  const url = "http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" + tag
+  return fetch(url).then(res => res.json())
+    .then(data => data.data.image_mp4_url)
+}
+
+const getVideoBlob = (videoUrl) => {
+  return fetch(videoUrl)
+    .then(res => {
+      console.log(res)
+      return res.blob()
+    })
+}
+
+const updateVideo = (videoblob) => {
+  if (_nextVideo === undefined) {
+    _nextVideo = videoblob
+    changeVideo()
+  }
+  _nextVideo = videoblob
+}
+
+const fetchGif = (tag) => {
+  console.log('omg')
+  return getMp4Link(tag)
+    .then(getVideoBlob)
+    .then(updateVideo)
+}
+
+const changeVideo = () => {
+  if (_nextVideo) {
+    video.src = URL.createObjectURL(_nextVideo)
+    _nextVideo = null
+  }
+  fetchGif('nicolas+cage')
+}
+
+video.addEventListener("playing", (ev) => {
+  changeVideo()
+})
+
+</script>
+</body>
