@@ -1,12 +1,33 @@
 <html>
 <head>
+<style>
+  html,body {
+    width:100%;
+    height:100%;
+    margin:0;
+  }
+  #monbeaugif, #mondeuxiemebeaugif {
+    width:100%;
+    height: 100%;
+    object-fit:cover;
+    /*float:right;*/
+    position:fixed;
+  }
+</style>
 </head>
 <body>
-<div><button onClick="fetchGif('nicolas+cage')"/>nicolas+cage</button></div>
-<video id="monbeaugif" autoplay loop />
+<video id="monbeaugif" autoplay loop style="z-index:1000"></video>
+<video id="mondeuxiemebeaugif" autoplay loop></video>
 <script>
+const wesh = (arg) => (console.log(arg), arg)
+const FRONT = 1000
+const BEHIND = 0
 const video = document.getElementById('monbeaugif')
+const video2 = document.getElementById('mondeuxiemebeaugif')
+
 let _nextVideo
+let cpt1 =0, cpt2 = 1
+
 
 const getMp4Link = (tag) => {
   const url = "http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" + tag
@@ -25,29 +46,63 @@ const getVideoBlob = (videoUrl) => {
 const updateVideo = (videoblob) => {
   if (_nextVideo === undefined) {
     _nextVideo = videoblob
-    changeVideo()
+    changeVideo(video)
+
   }
   _nextVideo = videoblob
 }
 
 const fetchGif = (tag) => {
-  console.log('omg')
   return getMp4Link(tag)
     .then(getVideoBlob)
     .then(updateVideo)
 }
 
-const changeVideo = () => {
-  if (_nextVideo) {
-    video.src = URL.createObjectURL(_nextVideo)
-    _nextVideo = null
+const isFirstPlaying = () => Boolean(video.style.zIndex == FRONT)
+
+const swap = () => {
+  console.log(isFirstPlaying())
+  console.log(video.style.zIndex, video2.style.zIndex)
+  if(isFirstPlaying()) {
+    video.style.zIndex = BEHIND
+    video2.style.zIndex = FRONT
+  } else {
+    video.style.zIndex = FRONT
+    video2.style.zIndex = BEHIND
   }
-  fetchGif('nicolas+cage')
 }
 
-video.addEventListener("playing", (ev) => {
-  changeVideo()
-})
+const displayVideo1 = (ev) => {
+  cpt1++
+  if(cpt1 > 1) {
+    changeVideo(video)
+    video2.pause()
+    swap()
+    cpt2=0
+  }
+}
 
+const displayVideo2 = (ev) => {
+  cpt2++
+  if(cpt2 > 1) {
+    changeVideo(video2)
+    video.pause()
+    swap()
+    cpt1 = 0
+  }
+}
+
+const changeVideo = (curVideo) => {
+  if (_nextVideo) {
+    curVideo.src = URL.createObjectURL(_nextVideo)
+    _nextVideo = null
+    fetchGif('nicolas+cage')
+  }
+}
+
+video.addEventListener("playing", displayVideo2)
+video2.addEventListener("playing", displayVideo1)
+
+fetchGif('nicolas+cage')
 </script>
 </body>
