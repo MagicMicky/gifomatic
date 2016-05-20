@@ -27,6 +27,7 @@ const video2 = document.getElementById('mondeuxiemebeaugif')
 
 let _nextVideo
 let cpt1 =0, cpt2 = 1
+let tag = "nicolas+cage"
 
 
 const getMp4Link = (tag) => {
@@ -52,7 +53,7 @@ const updateVideo = (videoblob) => {
   _nextVideo = videoblob
 }
 
-const fetchGif = (tag) => {
+const fetchGif = () => {
   return getMp4Link(tag)
     .then(getVideoBlob)
     .then(updateVideo)
@@ -74,7 +75,7 @@ const swap = () => {
 
 const displayVideo1 = (ev) => {
   cpt1++
-  if(cpt1 > 1) {
+  if(cpt1 > 1 && _nextVideo) {
     changeVideo(video)
     video2.pause()
     swap()
@@ -84,7 +85,7 @@ const displayVideo1 = (ev) => {
 
 const displayVideo2 = (ev) => {
   cpt2++
-  if(cpt2 > 1) {
+  if(cpt2 > 1 && _nextVideo) {
     changeVideo(video2)
     video.pause()
     swap()
@@ -96,13 +97,13 @@ const changeVideo = (curVideo) => {
   if (_nextVideo) {
     curVideo.src = URL.createObjectURL(_nextVideo)
     _nextVideo = null
-    fetchGif('nicolas+cage')
+    fetchGif()
   }
 }
 
 video.addEventListener("playing", displayVideo2)
 video2.addEventListener("playing", displayVideo1)
 
-fetchGif('nicolas+cage')
+fetchGif()
 </script>
 </body>
